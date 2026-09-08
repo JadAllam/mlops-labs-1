@@ -12,14 +12,23 @@ uv.lock and .venv showed up later when I ran uv add pillow. The lock has the exa
 
 Q2 - What are the created files, what are they used for, and which ones should be pushed to git?
 
+dvc init only created 4 things:
+
 .dvc/config        the dvc settings                     push
 .dvc/.gitignore    written by dvc                       push
-.dvcignore         like gitignore but for dvc           push
-.dvc/cache/        where the actual data files go       don't push
 .dvc/tmp/          locks and temp stuff                 don't push
-.dvc/config.local  machine config, where secrets go     don't push
+.dvcignore         like gitignore but for dvc           push
 
-dvc already ignores cache, tmp and config.local itself in .dvc/.gitignore.
+.dvc/cache/ is not there yet, it only shows up on the first dvc add, that's where
+the actual data files go. Same for .dvc/config.local, it only gets created if you
+run dvc remote modify --local.
+
+Both are already listed in .dvc/.gitignore though, so they can't be committed by
+accident:
+
+    /config.local
+    /tmp
+    /cache
 
 
 Q3 - Where are the credentials stored, what are the options other than --global,
