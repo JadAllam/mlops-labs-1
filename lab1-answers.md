@@ -13,11 +13,13 @@ should not, dvc already ignores them itself. config.local also stays out since t
 secrets go.
 
 Q3
-They're not in the repo, --global puts them in
+Not in the repo. --global puts them in
 C:\Users\jadal\AppData\Local\iterative\dvc\config
 The other options are --local which writes to .dvc/config.local, no flag at all which writes to
 .dvc/config, and --system for the whole machine.
-No they shouldn't be pushed to github, anyone could use the token.
+I ended up using --local since that's what dagshub gives you, so the token is in
+.dvc/config.local. dvc already ignores that file in .dvc/.gitignore.
+No they shouldn't be pushed to github, anyone with the token could read and overwrite the remote.
 
 Q4
 dvc added /data at the end of .gitignore. So git stops tracking the data folder and only tracks
