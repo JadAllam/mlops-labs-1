@@ -1,0 +1,97 @@
+LAB 1 - ANSWERS
+
+
+Q1 - Observe the files created by uv init, what do you think they contain.
+
+uv init made pyproject.toml, .python-version, README.md and src/mlops_lab_1/__init__.py.
+pyproject.toml has the project name and the dependencies list.
+.python-version just says 3.11 so uv knows which python to use.
+README is empty and the src folder is the package.
+uv.lock and .venv showed up later when I ran uv add pillow. The lock has the exact versions.
+
+
+Q2 - What are the created files, what are they used for, and which ones should be pushed to git?
+
+.dvc/config        the dvc settings                     push
+.dvc/.gitignore    written by dvc                       push
+.dvcignore         like gitignore but for dvc           push
+.dvc/cache/        where the actual data files go       don't push
+.dvc/tmp/          locks and temp stuff                 don't push
+.dvc/config.local  machine config, where secrets go     don't push
+
+dvc already ignores cache, tmp and config.local itself in .dvc/.gitignore.
+
+
+Q3 - Where are the credentials stored, what are the options other than --global,
+     should they be pushed to github?
+
+Not in the repo.
+--global   C:\Users\jadal\AppData\Local\iterative\dvc\config
+--local    .dvc/config.local
+no flag    .dvc/config
+--system   whole machine
+
+I ended up using --local since that's what dagshub gives you, so the token is in
+.dvc/config.local, which dvc already ignores.
+No they shouldn't be pushed to github, anyone with the token could read and
+overwrite the remote.
+
+
+Q4 - Take a look at the .gitignore file, explain what happened.
+
+dvc added /data at the end of .gitignore. So git stops tracking the data folder and
+only tracks data.dvc, that way git and dvc aren't both trying to version the same files.
+
+
+Q5 - Do you see a .dvc file? What does it contain?
+
+Yes, data.dvc in the root.
+
+    outs:
+    - md5: a3a457d03c51ff8b037a833440f6ad13.dir
+      size: 1188442712
+      nfiles: 16643
+      hash: md5
+      path: data
+
+The md5 of the whole data folder, the size in bytes, how many files there are and
+the path. Only 6 lines for 1.2GB of images.
+
+
+Q6 - Is the code on github? Is the data? Is there a file pointing to the data?
+     And on dagshub, do you see the data?
+
+Code       on github
+Data       not on github, /data is gitignored
+Pointer    data.dvc
+
+On dagshub the data shows up under the data tab once you dvc push.
+
+
+Q7 - Clone the repo in a new folder. Do you see the data folder? What command gets it?
+
+No data folder in the clone, just data.dvc.
+
+    $ ls data
+    ls: cannot access 'data': No such file or directory
+    $ dvc status
+    data.dvc:
+            changed outs:
+                    not in cache:       data
+
+You need dvc pull to get it.
+
+
+Q8 - After checking out the old commit, do you still see food11_processed and
+     food11_processed_mini?
+
+Right after git checkout they were still there, because git can't touch data since
+it's ignored.
+Once I ran dvc checkout they were gone and only food11_raw was left.
+
+    $ dvc checkout
+    M       data\
+    $ ls data/
+    food11_raw
+
+So you need both commands, git for the pointer and dvc for the actual data.
